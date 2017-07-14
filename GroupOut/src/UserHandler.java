@@ -1,34 +1,30 @@
+package src;  
+
 import java.sql.*;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
+//import javax.naming.Context;
+//import javax.naming.InitialContext;
 import javax.sql.DataSource;
+
+//import org.omg.Messaging.SyncScopeHelper;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 public class UserHandler {
 
-	public static final String GET_USERNAME = "SELECT userName FROM USER WHERE userID = ?"; // 1, userID
-	public static final String SET_USERNAME = "SET userName = ? WHERE userID = ?"; //1, userName. 2, userID
-    public static final String GET_PARTICIPANTCOUNTER = "SELECT participantCounter FROM USER WHERE userID = ?"; //1, userID
-    public static final String INCREASE_PARTICIPANTCOUNTER = "UPDATE USER SET participantCounter = participantCounter + 1 WHERE userID = ?"; //1, userID
-    public static final String GET_HOSTCOUNTER = "SELECT hostCounter FROM USER WHERE userID = ?"; //1, userID
-    public static final String INCREASE_HOSTCOUNTER = "UPDATE USER SET hostCounter = hostCounter + 1 WHERE userID = ?"; //1, userID
-    public static final String GET_GENDER = "SELECT gender FROM USER WHERE userID = ?"; //1, userID
-    public static final String SET_GENDER = "SET gender = ? WHERE userID = ?"; //1, gender, 2, userID
-    public static final String GET_AGE = "SELECT age FROM USER WHERE userID = ?"; //1, userID
-    public static final String SET_AGE = "SET age = ? WHERE userID = ?"; // 1, age, 2 userID
-	public static final String GET_NAME = "SELECT name FROM USER WHERE userID = ?"; // 1, userID
-	public static final String SET_NAME = "SET name = ? WHERE userID = ?"; //1, name, 2, UserID
+    public static final String GET_NAME = "SELECT name FROM User WHERE userID = ?"; // 1, userID
+    public static final String SET_NAME = "UPDATE User SET name = ? WHERE userID = ?;"; //1, userName. 2, userID
+    public static final String GET_EMAIL = "SELECT email FROM User WHERE userID = ?"; // 1, userID
+    public static final String SET_EMAIL = "UPDATE User SET email = ? WHERE userID = ?"; // 1, email. 2, userID  
 
-	public static DataSource getMySQLDataSource() { // Funkar denna som connect
+	public static DataSource getMySQLDataSource() {
 		MysqlDataSource mysqlDS = null;
 
 		try {
 			mysqlDS = new MysqlDataSource();
-			mysqlDS.setURL("jdbc:mysql://localhost:3306/mydb");
-			mysqlDS.setUser("root");
-			mysqlDS.setPassword("");
+			mysqlDS.setURL("jdbc:mysql://mysql.dsv.su.se/axan5350");
+			mysqlDS.setUser("axan5350");
+			mysqlDS.setPassword("Bae3Ohngieph");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -39,18 +35,13 @@ public class UserHandler {
 	public Connection getConnection() throws SQLException {
 		Connection connection = null;
 
-		// Get the MySqlDataSource
-
 		System.out.println("Verifying access");
 		DataSource dataSource = getMySQLDataSource();
-
-		// Get connection from the database
-
 		System.out.println("Connecting database...");
 		connection = dataSource.getConnection();
 
+		System.out.println("Connection completed!");
 		return connection;
-
 	}
 
 	public void closePrstmt(PreparedStatement prstmt) {
@@ -73,396 +64,30 @@ public class UserHandler {
 			sqlException.printStackTrace();
 		}
 	}
-
-	public String getUsername(int inputUserID) throws SQLException {
-		PreparedStatement prstmt = null;
-		String username = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(GET_USERNAME);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			while (rs.next()) {
-
-				// Retrieve by column name
-
-				username = rs.getString("username");
-
-				// Display values
-
-				System.out.println("username: " + username);
-
-			}
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-		return username;
+	
+	public void closeResources(PreparedStatement prstmt, Connection connection){
+		closePrstmt(prstmt); 
+		closeConnection(connection); 
 	}
-
-	public void setUsername(int inputUserID, String inputUsername) throws SQLException {
-
-		PreparedStatement prstmt = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(SET_USERNAME);
-
-			prstmt.setString(1, inputUsername);
-			prstmt.setInt(2, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-	}
-
-	public int getParticipantCounter(int inputUserID) throws SQLException {
-		PreparedStatement prstmt = null;
-		int participantCounter = -1;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(GET_PARTICIPANTCOUNTER);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			while (rs.next()) {
-
-				// Retrieve by column name
-
-				participantCounter = rs.getInt("participantCounter");
-
-				// Display values
-
-				System.out.println("participantCounter" + participantCounter);
-
-			}
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-		return participantCounter;
-	}
-
-	public void increaseParticipantCounter(int inputUserID) throws SQLException {
-
-		PreparedStatement prstmt = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(INCREASE_PARTICIPANTCOUNTER);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-
-	}
-
-	public int getHostCounter(int inputUserID) throws SQLException {
-		PreparedStatement prstmt = null;
-		int hostCounter = -1;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(GET_HOSTCOUNTER);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			while (rs.next()) {
-
-				// Retrieve by column name
-
-				hostCounter = rs.getInt("hostCounter");
-
-				// Display values
-
-				System.out.println("hostCounter" + hostCounter);
-
-			}
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-		return hostCounter;
-	}
-
-	public void increaseHostCounter(int inputUserID) throws SQLException {
-
-		PreparedStatement prstmt = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(INCREASE_HOSTCOUNTER);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-	}
-
-	public String getGender(int inputUserID) throws SQLException {
-		PreparedStatement prstmt = null;
-		String gender = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(GET_GENDER);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			while (rs.next()) {
-
-				// Retrieve by column name
-
-				gender = rs.getString("username");
-
-				// Display values
-
-				System.out.println("userID: " + gender);
-
-			}
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-		return gender;
-	}
-
-	public void setGender(String gender, int inputUserID) throws SQLException {
-
-		PreparedStatement prstmt = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(SET_GENDER);
-			
-			prstmt.setString(1, gender);	
-			prstmt.setInt(2, inputUserID); // Switch to correct preparedStatment
-										// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-	}
-
-	public int getAge(int inputUserID) throws SQLException {
-		PreparedStatement prstmt = null;
-		int age = -1;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(GET_AGE);
-
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			while (rs.next()) {
-
-				// Retrieve by column name
-
-				age = rs.getInt("age");
-
-				// Display values
-
-				System.out.println("age" + age);
-
-			}
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-		return age;
-	}
-
-	public void setAge(int age, int inputUserID) throws SQLException {
-
-		PreparedStatement prstmt = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(SET_AGE);
-
-			prstmt.setInt(1, age);
-			prstmt.setInt(2, inputUserID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-	}
-
+	
 	public String getName(int inputUserID) throws SQLException {
 		PreparedStatement prstmt = null;
 		String name = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(GET_NAME);
 
-			prstmt.setInt(1, inputUserID); // Switch to correct preparedStatment
-											// input
-
+			prstmt.setInt(1, inputUserID); 
+			
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
+				name = rs.getString("name");
 
-				name = rs.getString("username");
-
-				// Display values
-
-				System.out.println("userID" + name);
+				System.out.println("Name: " + name);
 
 			}
 			rs.close();
@@ -473,27 +98,23 @@ public class UserHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
+	
 		return name;
 	}
 
-	public void setName(String name, int inputUserID) throws SQLException {
+	public void setName(int inputUserID, String inputUsername) throws SQLException {
 
 		PreparedStatement prstmt = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(SET_NAME);
 
-			prstmt.setString(1, name);
-			prstmt.setInt(2, inputUserID); // Switch to correct preparedStatment
-											// input
+			prstmt.setString(1, inputUsername);
+			prstmt.setInt(2, inputUserID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -505,9 +126,67 @@ public class UserHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
+		}
+	}
+
+	public String getEmail(int inputUserID) throws SQLException {
+		PreparedStatement prstmt = null;
+		String email = null;
+		Connection connection = null;
+		try {
+			connection = getConnection();
+			
+			prstmt = connection.prepareStatement(GET_EMAIL);
+
+			prstmt.setInt(1, inputUserID); 
+			
+			ResultSet rs = prstmt.executeQuery();
+
+			while (rs.next()) {
+
+				email = rs.getString("email");
+
+				System.out.println("Email: " + email);
+
+			}
+			rs.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeResources(prstmt, connection);
+		}
+	
+		return email;
+	}
+
+	public void setemail(int inputUserID, String inputEmail) throws SQLException {
+
+		PreparedStatement prstmt = null;
+		Connection connection = null;
+		try {
+			connection = getConnection();
+
+			prstmt = connection.prepareStatement(SET_EMAIL);
+
+			prstmt.setString(1, inputEmail);
+			prstmt.setInt(2, inputUserID); 
+
+			ResultSet rs = prstmt.executeQuery();
+
+			rs.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeResources(prstmt, connection);
 		}
 	}
 }

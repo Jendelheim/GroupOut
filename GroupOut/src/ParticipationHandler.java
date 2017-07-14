@@ -1,3 +1,5 @@
+package src;  
+
 import java.sql.*;
 
 import javax.sql.DataSource;
@@ -8,19 +10,19 @@ public class ParticipationHandler {
 
 
 	
-	//Den här hämtar alla deltagare I ett visst event
+	//Den hï¿½r hï¿½mtar alla deltagare I ett visst event
 	public static final String SS = "SELECT * FROM Participation WHERE eventID = ?";
 	 
-	//Den här hämtar alla event en viss deltagare är registrerad på
+	//Den hï¿½r hï¿½mtar alla event en viss deltagare ï¿½r registrerad pï¿½
 	public static final String DD = "SELECT * FROM Participation WHERE userID = ? ";
 	 
-	//det här tar bort en deltagare ur ett specifikt event
+	//det hï¿½r tar bort en deltagare ur ett specifikt event
 	public static final String RR = "DELETE FROM Participation WHERE eventID = ? AND userID = ?";
 	 
-	//den här tar bort en deltagare från alla event den är anmäld till
+	//den hï¿½r tar bort en deltagare frï¿½n alla event den ï¿½r anmï¿½ld till
 	public static final String TT = " DELETE FROM Participation WHERE userID = ? ";
 	 
-	//den här tar bort ett event och alla deltagande
+	//den hï¿½r tar bort ett event och alla deltagande
 	public static final String YY = "DELETE FROM Participation WHERE eventID = ?"; 
 
 	
@@ -29,9 +31,9 @@ public class ParticipationHandler {
 
 		try {
 			mysqlDS = new MysqlDataSource();
-			mysqlDS.setURL("jdbc:mysql://localhost:3306/mydb");
-			mysqlDS.setUser("root");
-			mysqlDS.setPassword("");
+			mysqlDS.setURL("jdbc:mysql://mysql.dsv.su.se/axan5350");
+			mysqlDS.setUser("axan5350");
+			mysqlDS.setPassword("Bae3Ohngieph");
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,3 +1,5 @@
+package src;  
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -6,51 +8,41 @@ import java.sql.Date;
 import javax.sql.DataSource;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import java.sql.*;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 public class EventHandler {
 
-	public static final String GET_EVENTNAME = "SELECT eventName FROM Event WHERE eventID = ?"; // 1, eventID
-	public static final String SET_EVENTNAME = "SET eventName = ? WHERE eventID = ?"; //  1, eventName 2, eventID 
-	public static final String GET_LEADER = "SELECT  leader FROM Event WHERE eventID = ?"; // 1, eventID
-	public static final String SET_LEADER = "SET leader = ? WHERE eventID = ?"; // 1, userID 2, eventID 
-	public static final String GET_DATE = "SELECT date FROM Event WHERE eventID = ?"; // 1, eventID
-	public static final String SET_DATE = "SET date = ? WHERE eventID = ?"; // 1, date 2, eventID 
-	
-	public static final String GET_STARTTIME = "SELECT startTime FROM Event WHERE eventID = ?"; // 1, eventID 
-	public static final String SET_STARTTIME = "SET startTime = ? WHERE eventID = ?"; // 1, startTime 2, eventID 
-	public static final String GET_ENDTIME = "SELECT endTime FROM Event Where eventID = ?"; // 1, eventID 
-	public static final String SET_ENDTIME = "SET endTime = ? WHERE eventID = ?"; // 1, endTime 2, eventID 
-	public static final String GET_CATEGORY = "SELECT category FROM Event WHERE eventID = ?"; // 1, eventID 
-	public static final String SET_CATEGORY = "SET category = ? WHERE eventID = ?"; // 1, category 2, eventID 
-	public static final String GET_DESCRIPTION = "SELECT description FROM Event WHERE eventID = ?"; // 1, eventID 
-	public static final String SET_DESCRIPTION = "SET description = ? WHERE eventID = ?"; // 1, description 2, eventID 
-	public static final String GET_MIN_CAPACITY = "SELECT minCapacity FROM Event WHERE eventID = ?"; // 1, eventID
-	public static final String SET_MIN_CAPACITY = "SET minCapacity = ? WHERE eventID = ?"; // 1, minCapacity 2, eventID 
-	public static final String GET_MAX_CAPACITY = "SELECT maxCapacity FROM Event WHERE eventID = ?"; // 1, eventID
-	public static final String SET_MAX_CAPACITY = "SET maxCapacity = ? WHERE eventID = ? "; // 1, maxCapacity 2,eventID
-	public static final String GET_VISIBILITY = "SELECT visible FROM Event WHERE eventID = ?"; // 1, eventID 
-	public static final String SET_VISIBILITY = "SET visible = ? WHERE eventID = ? "; // 1, visibility 2, eventID
-	public static final String GET_PLACE = "SELECT place FROM Event WHERE eventID = ?"; // 1, eventID 
-	public static final String SET_PLACE = "SET place = ? WHERE eventID = ?"; // 1, place 2, eventID
-	public static final String GET_INPUTCOORDINATE_ID = "SELECT inputID FROM Event WHERE eventID = ?"; // 1, eventID
-	public static final String SET_INPUTCOORDINATE_ID = "SET inputID = ? WHERE eventID = ?"; // 1, inputID 2, eventID 
-	
+	public static final String GET_EVENTNAME = "SELECT eventName FROM Event WHERE eventID = ?;";
+	public static final String SET_EVENTNAME = "UPDATE Event SET eventName = ? WHERE eventID = ?;";
+	public static final String GET_LEADER = "SELECT  leaderID FROM Event WHERE eventID = ?;"; 
+	public static final String SET_LEADER = "UPDATE Event SET leaderID = ? WHERE eventID = ?;";
+	public static final String GET_DATE = "SELECT date FROM Event WHERE eventID = ?;";
+	public static final String SET_DATE = "UPDATE Event SET date = ? WHERE eventID = ?;";
+	public static final String GET_STARTTIME = "SELECT startTime FROM Event WHERE eventID = ?;";
+	public static final String SET_STARTTIME = "UPDATE Event SET  startTime = ? WHERE eventID = ?;";
+	public static final String GET_ENDTIME = "SELECT endTime FROM Event Where eventID = ?;";
+	public static final String SET_ENDTIME = "UPDATE Event SET endTime = ? WHERE eventID = ?;";
+	public static final String GET_CATEGORY = "SELECT category FROM Event WHERE eventID = ?;";
+	public static final String SET_CATEGORY = "UPDATE Event SET category = ? WHERE eventID = ?;";
+	public static final String GET_DESCRIPTION = "SELECT description FROM Event WHERE eventID = ?;";
+	public static final String SET_DESCRIPTION = "UPDATE Event SET description = ? WHERE eventID = ?;";
+	public static final String GET_MIN_CAPACITY ="SELECT minCapacity FROM Event WHERE eventID = ?;";
+	public static final String SET_MIN_CAPACITY ="UPDATE Event SET minCapacity = ? WHERE eventID = ?;";
+	public static final String GET_MAX_CAPACITY = "SELECT maxCapacity FROM Event WHERE eventID = ?;";
+	public static final String SET_MAX_CAPACITY = "UPDATE Event SET maxCapacity = ? WHERE eventID = ? ;";
+	public static final String GET_VISIBILITY = "SELECT visible FROM Event WHERE eventID = ?;";
+	public static final String SET_VISIBILITY = "UPDATE Event SET visible = ? WHERE eventID = ? ;";
+	public static final String GET_PLACE = "SELECT place FROM Event WHERE eventID = ?;";
+	public static final String SET_PLACE = "UPDATE Event SET place = ? WHERE eventID = ?;";
 
-	public static DataSource getMySQLDataSource() { // Funkar denna som connect
+	public static DataSource getMySQLDataSource() {
 		MysqlDataSource mysqlDS = null;
 
 		try {
 			mysqlDS = new MysqlDataSource();
-			mysqlDS.setURL("jdbc:mysql://localhost:3306/mydb");
-			mysqlDS.setUser("root");
-			mysqlDS.setPassword("");
+			mysqlDS.setURL("jdbc:mysql://mysql.dsv.su.se/axan5350");
+			mysqlDS.setUser("axan5350");
+			mysqlDS.setPassword("Bae3Ohngieph");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -71,6 +63,7 @@ public class EventHandler {
 		System.out.println("Connecting database...");
 		connection = dataSource.getConnection();
 
+		System.out.println("Connection completed!");
 		return connection;
 
 	}
@@ -95,6 +88,11 @@ public class EventHandler {
 			sqlException.printStackTrace();
 		}
 	}
+	
+	public void closeResources(PreparedStatement prstmt, Connection connection){
+		closePrstmt(prstmt); 
+		closeConnection(connection); 
+	}
 
 	public String getEventName(int eventID) {
 		PreparedStatement prstmt = null;
@@ -102,26 +100,17 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_EVENTNAME);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
-
+			prstmt.setInt(1, eventID); 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
-
 				eventName = rs.getString("username");
 
-				// Display values
-
 				System.out.println("userID" + eventName);
-
 			}
 			rs.close();
 		} catch (SQLException se) {
@@ -131,28 +120,21 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 		return eventName;
 	}
 
 	public void setEventName(String eventName, int eventID) {
-
 		PreparedStatement prstmt = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(SET_EVENTNAME);
-
 			
 			prstmt.setString(1, eventName);
-			prstmt.setInt(2, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(2, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -164,9 +146,7 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
@@ -176,26 +156,18 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(GET_LEADER);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
-
 				leader = rs.getInt("participantCounter");
 
-				// Display values
-
 				System.out.println("participantCounter" + leader);
-
 			}
 			rs.close();
 		} catch (SQLException se) {
@@ -205,9 +177,7 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 		return leader;
 	}
@@ -218,15 +188,12 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(SET_LEADER);
 
 			
 			prstmt.setInt(1, userID);
-			prstmt.setInt(2, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(2, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -238,9 +205,7 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
@@ -250,23 +215,16 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_DATE);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
-
 				date = rs.getDate("date");
-
-				// Display values
 
 				System.out.println("Date: " + date);
 
@@ -279,9 +237,7 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 		return date;
 	}
@@ -292,14 +248,11 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(SET_DATE);
 
 			prstmt.setDate(1, date);
-			prstmt.setInt(2, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(2, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -311,37 +264,27 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
 	public long getStartTime(int eventID) {
 		PreparedStatement prstmt = null;
-		int participantCounter = -1;
+		int startTime = -1;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_STARTTIME);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
-
-				participantCounter = rs.getInt("participantCounter");
-
-				// Display values
-
-				System.out.println("participantCounter" + participantCounter);
+				startTime = rs.getInt("startTime");
+				System.out.println("startTime" + startTime);
 
 			}
 			rs.close();
@@ -352,11 +295,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
-		return participantCounter;
+		return startTime;
 	}
 
 	public void setStartTime(long startTime, int eventID) {
@@ -365,7 +306,7 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
+			
 			// Execute query
 
 			prstmt = connection.prepareStatement(SET_STARTTIME);
@@ -384,38 +325,28 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
 	public long getEndTime(int eventID) {
 		PreparedStatement prstmt = null;
-		int participantCounter = -1;
+		int endTime = -1;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_ENDTIME);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
+				endTime = rs.getInt("endTime");
 
-				participantCounter = rs.getInt("participantCounter");
-
-				// Display values
-
-				System.out.println("participantCounter" + participantCounter);
-
+				System.out.println("participantCounter" + endTime);
 			}
 			rs.close();
 		} catch (SQLException se) {
@@ -425,11 +356,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
-		return participantCounter;
+		return endTime;
 	}
 
 	public void setEndTime(int eventID) {
@@ -438,13 +367,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(SET_ENDTIME);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -456,37 +382,28 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
 	public String getCategory(int eventID) {
 		PreparedStatement prstmt = null;
-		String username = null;
+		String category = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_CATEGORY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
+				category = rs.getString("category");
 
-				username = rs.getString("username");
-
-				// Display values
-
-				System.out.println("userID" + username);
+				System.out.println("Category: " + category);
 
 			}
 			rs.close();
@@ -497,11 +414,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
-		return username;
+		return category;
 	}
 
 	public void setCategory(int eventID) {
@@ -510,13 +425,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(SET_CATEGORY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -528,37 +440,28 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
 	public String getDescription(int eventID) {
 		PreparedStatement prstmt = null;
-		String username = null;
+		String description = null;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_DESCRIPTION);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
+				
+				description = rs.getString("description");
 
-				// Retrieve by column name
-
-				username = rs.getString("username");
-
-				// Display values
-
-				System.out.println("userID" + username);
+				System.out.println("Description: " + description);
 
 			}
 			rs.close();
@@ -569,11 +472,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
-		return username;
+		return description;
 	}
 
 	public void setDescription(int eventID) {
@@ -582,13 +483,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(SET_DESCRIPTION);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -600,37 +498,28 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
 	public int getMinCapacity(int eventID) {
 		PreparedStatement prstmt = null;
-		int participantCounter = -1;
+		int minCapacity = -1;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
 
 			prstmt = connection.prepareStatement(GET_MIN_CAPACITY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
+				minCapacity = rs.getInt("minCapacity");
 
-				participantCounter = rs.getInt("participantCounter");
-
-				// Display values
-
-				System.out.println("participantCounter" + participantCounter);
+				System.out.println("MinCapacity: " + minCapacity);
 
 			}
 			rs.close();
@@ -641,11 +530,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
-		return participantCounter;
+		return minCapacity;
 	}
 
 	public void setMinCapacity(int eventID) {
@@ -654,13 +541,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(SET_MIN_CAPACITY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -672,38 +556,28 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
 	public int getMaxCapacity(int eventID) {
 		PreparedStatement prstmt = null;
-		int participantCounter = -1;
+		int maxCapacity = -1;
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(GET_MAX_CAPACITY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
+				maxCapacity = rs.getInt("maxCapacity");
 
-				participantCounter = rs.getInt("participantCounter");
-
-				// Display values
-
-				System.out.println("participantCounter" + participantCounter);
-
+				System.out.println("MaxCapacity: " + maxCapacity);
 			}
 			rs.close();
 		} catch (SQLException se) {
@@ -713,11 +587,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
-		return participantCounter;
+		return maxCapacity;
 	}
 
 	public void setMaxCapacity(int eventID) {
@@ -726,13 +598,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(SET_MAX_CAPACITY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -744,9 +613,7 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
@@ -756,23 +623,16 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(GET_VISIBILITY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
 			while (rs.next()) {
 
-				// Retrieve by column name
-
 				visibility = rs.getBoolean("visibility");
-
-				// Display values
 
 				System.out.println("visibility: " + visibility);
 
@@ -785,9 +645,7 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 		return visibility;
 	}
@@ -798,13 +656,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(SET_VISIBILITY);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID); 
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -816,13 +671,11 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
-	public void getPlace(int eventID) { // Ska vara något annat än void
+	public void getPlace(int eventID) { // Ska vara nï¿½got annat ï¿½n void
 
 	}
 
@@ -832,13 +685,10 @@ public class EventHandler {
 		Connection connection = null;
 		try {
 			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
+			
 			prstmt = connection.prepareStatement(SET_PLACE);
 
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
+			prstmt.setInt(1, eventID);
 
 			ResultSet rs = prstmt.executeQuery();
 
@@ -850,82 +700,9 @@ public class EventHandler {
 		}
 
 		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
+			closeResources(prstmt, connection);
 		}
 	}
 
-	public int getInputCoordinateID(int eventID) {
-		PreparedStatement prstmt = null;
-		int participantCounter = -1;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(GET_INPUTCOORDINATE_ID);
-
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			while (rs.next()) {
-
-				// Retrieve by column name
-
-				participantCounter = rs.getInt("participantCounter");
-
-				// Display values
-
-				System.out.println("participantCounter" + participantCounter);
-
-			}
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-		return participantCounter;
-	}
-
-	public void setInputCoordinateID(int eventID) {
-
-		PreparedStatement prstmt = null;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			System.out.println("Database connected!");
-			// Execute query
-
-			prstmt = connection.prepareStatement(SET_INPUTCOORDINATE_ID);
-
-			prstmt.setInt(1, eventID); // Switch to correct preparedStatment
-											// input
-
-			ResultSet rs = prstmt.executeQuery();
-
-			rs.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			// Finally block used to close resources
-			closePrstmt(prstmt);
-			closeConnection(connection);
-		}
-	}
 
 }
